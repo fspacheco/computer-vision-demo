@@ -37,6 +37,7 @@ private slots:
     void pluginPerform();
     // operations
     void toGrayscaleImage();
+    void thresholdImage();
 
 private:
     QMenu *fileMenu;
@@ -61,6 +62,7 @@ private:
     QAction *aboutAction;
 
     QAction *toGrayscaleAction;
+    QAction *thresholdAction;
 
     QString currentImagePath;
     QGraphicsPixmapItem *currentImage;

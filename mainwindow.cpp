@@ -78,8 +78,11 @@ void MainWindow::createActions()
 
     // operation actions
     toGrayscaleAction = new QAction("to Grayscale", this);
+    thresholdAction = new QAction("Threshold", this);
     editToolBar->addAction(toGrayscaleAction);
+    editToolBar->addAction(thresholdAction);
     connect(toGrayscaleAction, SIGNAL(triggered(bool)), this, SLOT(toGrayscaleImage()));
+    connect(thresholdAction, SIGNAL(triggered(bool)), this, SLOT(thresholdImage()));
 }
 
 void MainWindow::openImage()
@@ -230,3 +233,39 @@ void MainWindow::toGrayscaleImage()
     mainStatusLabel->setText(status);
 }
 
+void MainWindow::thresholdImage()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No image to edit.");
+        return;
+    }
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_RGB888);
+    cv::Mat mat = cv::Mat(
+        image.height(),
+        image.width(),
+        CV_8UC3,
+        image.bits(),
+        image.bytesPerLine());
+
+    cv::Mat tmp;
+    cv::threshold(mat, tmp, 128, 255, cv::THRESH_BINARY);
+    mat = tmp;
+
+    QImage image_thresholded(
+        mat.data,
+        mat.cols,
+        mat.rows,
+        mat.step,
+        QImage::Format_RGB888);
+    pixmap = QPixmap::fromImage(image_thresholded);
+    imageScene->clear();
+    imageView->resetMatrix();
+    currentImage = imageScene->addPixmap(pixmap);
+    imageScene->update();
+    imageView->setSceneRect(pixmap.rect());
+    QString status = QString("(image with threshold applied), %1x%2")
+        .arg(pixmap.width()).arg(pixmap.height());
+    mainStatusLabel->setText(status);
+}

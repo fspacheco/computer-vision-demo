@@ -76,6 +76,10 @@ void MainWindow::createActions()
 
     setupShortcuts();
 
+    // operation actions
+    toGrayscaleAction = new QAction("to Grayscale", this);
+    editToolBar->addAction(toGrayscaleAction);
+    connect(toGrayscaleAction, SIGNAL(triggered(bool)), this, SLOT(toGrayscaleImage()));
 }
 
 void MainWindow::openImage()
@@ -90,7 +94,6 @@ void MainWindow::openImage()
         showImage(filePaths.at(0));
     }
 }
-
 
 void MainWindow::showImage(QString path)
 {
@@ -206,3 +209,24 @@ void MainWindow::pluginPerform()
         .arg(pixmap.width()).arg(pixmap.height());
     mainStatusLabel->setText(status);
 }
+
+void MainWindow::toGrayscaleImage()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No image to edit.");
+        return;
+    }
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_Grayscale8);
+    pixmap = QPixmap::fromImage(image);
+    imageScene->clear();
+    imageView->resetMatrix();
+    currentImage = imageScene->addPixmap(pixmap);
+    imageScene->update();
+    imageView->setSceneRect(pixmap.rect());
+    QString status = QString("(grayscale image), %1x%2")
+        .arg(pixmap.width()).arg(pixmap.height());
+    mainStatusLabel->setText(status);
+}
+

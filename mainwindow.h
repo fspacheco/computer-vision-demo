@@ -35,6 +35,8 @@ private slots:
     void saveAs();
     void showAboutInfo();
     void pluginPerform();
+    // operations
+    void toGrayscaleImage();
 
 private:
     QMenu *fileMenu;
@@ -57,6 +59,8 @@ private:
     QAction *exitAction;
 
     QAction *aboutAction;
+
+    QAction *toGrayscaleAction;
 
     QString currentImagePath;
     QGraphicsPixmapItem *currentImage;

@@ -79,10 +79,13 @@ void MainWindow::createActions()
     // operation actions
     toGrayscaleAction = new QAction("to Grayscale", this);
     thresholdAction = new QAction("Threshold", this);
+    connectedCompAction = new QAction("Connect.Comp", this);
     editToolBar->addAction(toGrayscaleAction);
     editToolBar->addAction(thresholdAction);
+    editToolBar->addAction(connectedCompAction);
     connect(toGrayscaleAction, SIGNAL(triggered(bool)), this, SLOT(toGrayscaleImage()));
     connect(thresholdAction, SIGNAL(triggered(bool)), this, SLOT(thresholdImage()));
+    connect(connectedCompAction, SIGNAL(triggered(bool)), this, SLOT(connectedCompImage()));
 }
 
 void MainWindow::openImage()
@@ -143,7 +146,7 @@ void MainWindow::showAboutInfo()
     QString infoStr = "This demo shows the processing flow for a computer vision application.\n";
     infoStr.append("The application in mind is counting objects, like food grains. You can run it step by step.\n\n");
     infoStr.append("Author: Fernando S. Pacheco - 2021\n\n");
-    infoStr.append("Based on examples from the book Qt 5 and OpenCV 4 Computer Vision Projects by Zhuo Qingliang");
+    infoStr.append("GUI interface based on code from the book Qt 5 and OpenCV 4 Computer Vision Projects by Zhuo Qingliang");
     QMessageBox::about(this, "About", infoStr);    
 }
 
@@ -267,5 +270,47 @@ void MainWindow::thresholdImage()
     imageView->setSceneRect(pixmap.rect());
     QString status = QString("(image with threshold applied), %1x%2")
         .arg(pixmap.width()).arg(pixmap.height());
+    mainStatusLabel->setText(status);
+}
+
+void MainWindow::connectedCompImage()
+{
+    if (currentImage == nullptr) {
+        QMessageBox::information(this, "Information", "No image to edit.");
+        return;
+    }
+    QPixmap pixmap = currentImage->pixmap();
+    QImage image = pixmap.toImage();
+    image = image.convertToFormat(QImage::Format_RGB888);
+    // matC3: RGB image to draw circles
+    cv::Mat matC3 = cv::Mat(image.height(), image.width(), CV_8UC3, image.bits(), image.bytesPerLine());
+
+    // imageC1, matC1: single channel image (required by connecteComponentesWithStats)
+    QImage imageC1 = pixmap.toImage();
+    imageC1 = image.convertToFormat(QImage::Format_Grayscale8);
+    cv::Mat matC1 = cv::Mat(imageC1.height(), imageC1.width(), CV_8UC1, imageC1.bits(), imageC1.bytesPerLine());
+
+    cv::Mat labelImage, stats, centroids;
+
+    int nLabels = connectedComponentsWithStats(matC1, labelImage, stats, centroids);
+
+    cv::Point center;
+    for (int i=0;i<nLabels;i++) {
+        //std::cout << stats.at<int>(i,cv::CC_STAT_LEFT) << std::endl;
+        center.x = (int)centroids.at<double>(i,0);
+        center.y = (int)centroids.at<double>(i,1);
+        cv::circle(matC3, center, 10, cv::Scalar(255, 0, 0), -1);
+    }
+
+    QImage image_labeled(matC3.data, matC3.cols, matC3.rows, matC3.step, QImage::Format_RGB888);
+    pixmap = QPixmap::fromImage(image_labeled);
+    imageScene->clear();
+    imageView->resetMatrix();
+    currentImage = imageScene->addPixmap(pixmap);
+    imageScene->update();
+    imageView->setSceneRect(pixmap.rect());
+    QString status = QString("(");
+    status.append(QString::number(nLabels));
+    status.append(" blobs found)");
     mainStatusLabel->setText(status);
 }

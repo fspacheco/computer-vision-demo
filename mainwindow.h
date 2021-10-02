@@ -38,6 +38,7 @@ private slots:
     // operations
     void toGrayscaleImage();
     void thresholdImage();
+    void connectedCompImage();
 
 private:
     QMenu *fileMenu;
@@ -63,6 +64,7 @@ private:
 
     QAction *toGrayscaleAction;
     QAction *thresholdAction;
+    QAction *connectedCompAction;
 
     QString currentImagePath;
     QGraphicsPixmapItem *currentImage;

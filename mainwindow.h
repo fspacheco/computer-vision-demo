@@ -35,12 +35,17 @@ private slots:
     void saveAs();
     void showAboutInfo();
     void pluginPerform();
+
+    void setThreshold();
+
     // operations
     void toGrayscaleImage();
     void thresholdImage();
     void connectedCompImage();
 
 private:
+    int thresholdValue = 128;
+
     QMenu *fileMenu;
     QMenu *viewMenu;
     QMenu *editMenu;
@@ -61,6 +66,8 @@ private:
     QAction *exitAction;
 
     QAction *aboutAction;
+
+    QAction *setThresholdAction;
 
     QAction *toGrayscaleAction;
     QAction *thresholdAction;

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QPluginLoader>
 #include <QString>
+#include <QInputDialog>
 
 #include "opencv2/opencv.hpp"
 
@@ -63,6 +64,9 @@ void MainWindow::createActions()
 
     aboutAction = new QAction("About", this);
     helpMenu->addAction(aboutAction);
+    
+    setThresholdAction = new QAction("Set Threshold Value", this);
+    editMenu->addAction(setThresholdAction);
 
     // add actions to toolbars
     fileToolBar->addAction(openAction);
@@ -71,6 +75,8 @@ void MainWindow::createActions()
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(openAction, SIGNAL(triggered(bool)), this, SLOT(openImage()));
     connect(saveAsAction, SIGNAL(triggered(bool)), this, SLOT(saveAs()));
+
+    connect(setThresholdAction, SIGNAL(triggered(bool)), this, SLOT(setThreshold()));
 
     connect(aboutAction, SIGNAL(triggered(bool)), this, SLOT(showAboutInfo()));
 
@@ -253,7 +259,7 @@ void MainWindow::thresholdImage()
         image.bytesPerLine());
 
     cv::Mat tmp;
-    cv::threshold(mat, tmp, 128, 255, cv::THRESH_BINARY);
+    cv::threshold(mat, tmp, thresholdValue, 255, cv::THRESH_BINARY);
     mat = tmp;
 
     QImage image_thresholded(
@@ -268,8 +274,8 @@ void MainWindow::thresholdImage()
     currentImage = imageScene->addPixmap(pixmap);
     imageScene->update();
     imageView->setSceneRect(pixmap.rect());
-    QString status = QString("(image with threshold applied), %1x%2")
-        .arg(pixmap.width()).arg(pixmap.height());
+    QString status = QString("(image with threshold %1 applied), %2x%3")
+        .arg(thresholdValue).arg(pixmap.width()).arg(pixmap.height());
     mainStatusLabel->setText(status);
 }
 
@@ -313,4 +319,16 @@ void MainWindow::connectedCompImage()
     status.append(QString::number(nLabels));
     status.append(" blobs found)");
     mainStatusLabel->setText(status);
+}
+
+void MainWindow::setThreshold()
+{
+    bool ok;
+    int i = QInputDialog::getInt(this, tr("Threshold value"),
+                                 tr("0-255"), thresholdValue, 0, 255, 1, &ok);
+    if (ok) {
+        //integerLabel->setText(tr("%1%").arg(i));
+        std::cout << "value:" << i << std::endl;
+        thresholdValue = i;
+    }
 }

@@ -7,6 +7,7 @@
 #include <QPluginLoader>
 #include <QString>
 #include <QInputDialog>
+#include <QDebug>
 
 #include "opencv2/opencv.hpp"
 
@@ -328,8 +329,8 @@ void MainWindow::connectedCompImage()
     int nLabels = connectedComponentsWithStats(matC1, labelImage, stats, centroids);
 
     cv::Point center;
-    for (int i=0;i<nLabels;i++) {
-        //std::cout << stats.at<int>(i,cv::CC_STAT_LEFT) << std::endl;
+    for (int i=1;i<nLabels;i++) { // index 0 is the background. We start at 1
+        //qDebug() << stats.at<int>(i,cv::CC_STAT_LEFT);
         center.x = (int)centroids.at<double>(i,0);
         center.y = (int)centroids.at<double>(i,1);
         cv::circle(matC3, center, 10, cv::Scalar(255, 0, 0), -1);
@@ -343,7 +344,7 @@ void MainWindow::connectedCompImage()
     imageScene->update();
     imageView->setSceneRect(pixmap.rect());
     QString status = QString("(");
-    status.append(QString::number(nLabels));
+    status.append(QString::number(nLabels-1)); // index 0 is the background. So we do nLabels-1
     status.append(" blobs found)");
     mainStatusLabel->setText(status);
 }

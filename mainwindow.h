@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QGraphicsPixmapItem>
 #include <QMap>
+#include <QStack>
 
 #include "cvdemo_plugin_interface.h"
 
@@ -36,6 +37,8 @@ private slots:
     void showAboutInfo();
     void pluginPerform();
 
+    void undo();
+
     void setThreshold();
 
     // operations
@@ -45,6 +48,8 @@ private slots:
 
 private:
     int thresholdValue = 128;
+
+    QStack<QPixmap> undoStack;
 
     QMenu *fileMenu;
     QMenu *viewMenu;
@@ -66,6 +71,8 @@ private:
     QAction *exitAction;
 
     QAction *aboutAction;
+
+    QAction *undoAction;
 
     QAction *setThresholdAction;
 

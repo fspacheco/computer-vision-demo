@@ -65,7 +65,9 @@ void MainWindow::createActions()
     aboutAction = new QAction("About", this);
     helpMenu->addAction(aboutAction);
     
+    undoAction = new QAction("Undo", this);
     setThresholdAction = new QAction("Set Threshold Value", this);
+    editMenu->addAction(undoAction);
     editMenu->addAction(setThresholdAction);
 
     // add actions to toolbars
@@ -75,6 +77,8 @@ void MainWindow::createActions()
     connect(exitAction, SIGNAL(triggered(bool)), QApplication::instance(), SLOT(quit()));
     connect(openAction, SIGNAL(triggered(bool)), this, SLOT(openImage()));
     connect(saveAsAction, SIGNAL(triggered(bool)), this, SLOT(saveAs()));
+
+    connect(undoAction, SIGNAL(triggered(bool)), this, SLOT(undo()));
 
     connect(setThresholdAction, SIGNAL(triggered(bool)), this, SLOT(setThreshold()));
 
@@ -112,6 +116,9 @@ void MainWindow::showImage(QString path)
     imageScene->clear();
     imageView->resetMatrix();
     QPixmap image(path);
+    if (!undoStack.isEmpty()) { //not for the first image
+        undoStack.push(image);
+    }
     currentImage = imageScene->addPixmap(image);
     imageScene->update();
     imageView->setSceneRect(image.rect());
@@ -121,6 +128,19 @@ void MainWindow::showImage(QString path)
     currentImagePath = path;
 }
 
+void MainWindow::undo()
+{
+    if (!undoStack.isEmpty()) {
+        QPixmap pixmap = undoStack.pop();
+        imageScene->clear();
+        imageView->resetMatrix();
+        currentImage = imageScene->addPixmap(pixmap);
+        imageScene->update();
+        imageView->setSceneRect(pixmap.rect());
+        QString status = QString("Undo");
+        mainStatusLabel->setText(status);
+    }
+}
 void MainWindow::saveAs()
 {
     if (currentImage == nullptr) {
@@ -229,6 +249,7 @@ void MainWindow::toGrayscaleImage()
         return;
     }
     QPixmap pixmap = currentImage->pixmap();
+    undoStack.push(pixmap);
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_Grayscale8);
     pixmap = QPixmap::fromImage(image);
@@ -249,6 +270,7 @@ void MainWindow::thresholdImage()
         return;
     }
     QPixmap pixmap = currentImage->pixmap();
+    undoStack.push(pixmap);
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_RGB888);
     cv::Mat mat = cv::Mat(
@@ -286,6 +308,7 @@ void MainWindow::connectedCompImage()
         return;
     }
     QPixmap pixmap = currentImage->pixmap();
+    undoStack.push(pixmap);
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_RGB888);
     // matC3: RGB image to draw circles

@@ -165,6 +165,9 @@ void MainWindow::saveAs()
 
 void MainWindow::setupShortcuts()
 {
+    QList<QKeySequence> shortcuts;
+    shortcuts << Qt::CTRL+Qt::Key_Z;
+    undoAction->setShortcuts(shortcuts);
 }
 
 void MainWindow::showAboutInfo()
@@ -214,6 +217,7 @@ void MainWindow::pluginPerform()
     }
 
     QPixmap pixmap = currentImage->pixmap();
+    undoStack.push(pixmap);
     QImage image = pixmap.toImage();
     image = image.convertToFormat(QImage::Format_RGB888);
     cv::Mat mat = cv::Mat(

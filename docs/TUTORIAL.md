@@ -26,3 +26,34 @@ Applying again the connected-component labeling, we have only one missed count. 
 
 ![Count eroded rice image!](count-eroded-rice-image.png?raw=true)
 
+## Counting red beans
+
+For another image, with 31 red beans, the process is almost the same, but we need to adjust the threshold value and invert background/foreground. Let's check it.
+
+Opening the image, you will find that there are some shadows in the corners as well as glare on the beans.
+
+![Red beans image!](load-red-beans-image.png?raw=true)
+
+Converting to grayscale, now we see a difference.
+
+![Grayscale beans!](grayscale-red-beans-image.png?raw=true)
+
+We can apply the threshold operation with the default value of 128.
+
+![Threshold 128 beans!](threshold-128-red-beans-image.png?raw=true)
+
+We can see a lot of noise in the corners. So, it is better to adjust the threshold. Undoing the operation, we can set the threshold for 95 (in a future version, I'll add a histogram; there are also automatic thresholding algorithms). 
+
+![Set threshold 95 to beans!](set-threshold-95-red-beans-image.png?raw=true)
+
+![Threshold 95 beans!](threshold-95-red-beans-image.png?raw=true)
+
+The connected-component labeling algorithm assumes that the foregound is white and the background is black, so we need to invert the image.
+
+![Invert beans!](invert-red-beans-image.png?raw=true)
+
+And now, the result for counting the beans. It is a good result, with 3 errors from "glued" beans, 1 error from the glare (I was expecting more problems with it), and 1 in the upper left corner. Try to improve the results adjusting the threshold, and applying erosion and dilation!
+
+![Count beans!](count-red-beans-image.png?raw=true)
+
+There are more advanced techniques to apply, but I hope you've learning the basics with this tutorial.

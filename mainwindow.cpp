@@ -306,6 +306,16 @@ void MainWindow::thresholdImage()
     mainStatusLabel->setText(status);
 }
 
+int calcMeanArea(cv::Mat stats, int nLabels) {
+    int meanArea = 0;
+    for (int i=1; i<nLabels; i++) { // idx 0 is the whole background
+        meanArea += stats.at<int>(i, cv::CC_STAT_AREA);
+    }
+    meanArea /= (nLabels-1);
+    //qDebug() << "mean" << meanArea;
+    return meanArea;
+}
+
 void MainWindow::connectedCompImage()
 {
     if (currentImage == nullptr) {
@@ -329,11 +339,25 @@ void MainWindow::connectedCompImage()
     int nLabels = connectedComponentsWithStats(matC1, labelImage, stats, centroids);
 
     cv::Point center;
-    for (int i=1;i<nLabels;i++) { // index 0 is the background. We start at 1
-        //qDebug() << stats.at<int>(i,cv::CC_STAT_LEFT);
+    // mean area
+    int meanArea = calcMeanArea(stats, nLabels);
+
+    // Draw a circle in the center of the detected object.
+    // Red for low confidence (area 30% smaller or bigger than mean)
+    // Green for high confidence    
+    cv::Scalar color;
+    for (int i=1; i<nLabels; i++) { // index 0 is the background. We start at 1
         center.x = (int)centroids.at<double>(i,0);
         center.y = (int)centroids.at<double>(i,1);
-        cv::circle(matC3, center, 10, cv::Scalar(255, 0, 0), -1);
+        int area = stats.at<int>(i, cv::CC_STAT_AREA);
+        if (area > 1.3*meanArea || area < 0.7*meanArea) {
+            // low confidence, area 30% smaller or bigger than mean
+            color = cv::Scalar(180, 0, 0);
+        }
+        else { 
+            color = cv::Scalar(0, 180, 0); // high confidence
+        }
+        cv::circle(matC3, center, 6, color, -1);
     }
 
     QImage image_labeled(matC3.data, matC3.cols, matC3.rows, matC3.step, QImage::Format_RGB888);

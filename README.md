@@ -16,4 +16,4 @@ There are two examples images in `docs`:
 - [50 grains of rice](docs/rice-count-50-640x480-IMG_7802.jpg)
 - [31 grains of red bean](docs/red-beans-count-31_640x480-IMG_7804.jpg)
 
-[Tutorial](docs/TUTORIAL.md)
+Check the [Tutorial](docs/TUTORIAL.md)

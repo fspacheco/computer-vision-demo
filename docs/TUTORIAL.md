@@ -56,4 +56,4 @@ And now, the result for counting the beans. It is a good result, with 3 errors f
 
 ![Count beans!](count-red-beans-image.png?raw=true)
 
-There are more advanced techniques to apply, but I hope you've learning the basics with this tutorial.
+There are more advanced techniques to apply, but I hope you've learned the basics with this tutorial.

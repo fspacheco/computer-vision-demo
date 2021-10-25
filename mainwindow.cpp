@@ -145,7 +145,7 @@ void MainWindow::undo()
 void MainWindow::saveAs()
 {
     if (currentImage == nullptr) {
-        QMessageBox::information(this, "Information", "Noting to save.");
+        QMessageBox::information(this, "Information", "Nothing to save.");
         return;
     }
     QFileDialog dialog(this);
@@ -329,7 +329,7 @@ void MainWindow::connectedCompImage()
     // matC3: RGB image to draw circles
     cv::Mat matC3 = cv::Mat(image.height(), image.width(), CV_8UC3, image.bits(), image.bytesPerLine());
 
-    // imageC1, matC1: single channel image (required by connecteComponentesWithStats)
+    // imageC1, matC1: single channel image (required by connectedComponentsWithStats)
     QImage imageC1 = pixmap.toImage();
     imageC1 = image.convertToFormat(QImage::Format_Grayscale8);
     cv::Mat matC1 = cv::Mat(imageC1.height(), imageC1.width(), CV_8UC1, imageC1.bits(), imageC1.bytesPerLine());

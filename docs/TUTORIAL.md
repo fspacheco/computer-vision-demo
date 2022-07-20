@@ -14,11 +14,11 @@ Now, we transform the grayscale image into a binary (only black and white) image
 
 ![Threshold 128 rice!](threshold-128-rice-image.png?raw=true)
 
-After that, we can apply a connected-component labeling algorithm that search all the image for blobs (white pixels that are connected somehow). This application draws a circle for each detected object. If the area of the object is more than 30% smaller or bigger than mean area, the circle is red, indicating lower confidence in the detection. If the area is between this 30% limits, the circle is green. The result for the rice image is the following.
+After that, we can apply a connected-component labeling algorithm that searches the whole image for blobs (white pixels that are connected somehow). This application draws a circle for each detected object. If the area of the object is more than 30% smaller or bigger than mean area, the circle is red, indicating lower confidence in the detection. If the area is between these 30% limits, the circle is green. The result for the rice image is the following.
 
 ![Count rice!](count-rice-image.png?raw=true)
 
-So, we see that two clusters each with 2 grains are wrongly detected as one grain. We can improve the detection trying to dissolve the link between the grains with a morphological operators called erosion. It is like using a rubber around the borders of the object. We undo the counting (Ctrl+Z) and apply twice the erosion. 
+So, we see that two clusters with 2 grains each are wrongly detected as one grain. We can improve the detection trying to dissolve the link between the grains with a morphological operators called erosion. It is like using a rubber around the borders of the object. We undo the counting (Ctrl+Z) and apply twice the erosion. 
 
 ![Eroded rice image!](eroded2x-rice-image.png?raw=true)
 
